@@ -1,0 +1,373 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Portfolio of Sourabh Mishra, IT Delivery Leader with 20+ years of experience in global IT transformations.">
+    <title>Sourabh Mishra - IT Delivery Leader Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        header {
+            background-color: #1a3c6e;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        header p {
+            margin: 0.5rem 0;
+            font-size: 1.2rem;
+        }
+        nav {
+            background-color: #2e5cb8;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 1rem;
+            font-weight: 700;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        section {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h2 {
+            color: #1a3c6e;
+            font-size: 2rem;
+            border-bottom: 2px solid #2e5cb8;
+            padding-bottom: 0.5rem;
+        }
+        .project {
+            background-color: white;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .project h3 {
+            margin: 0 0 0.5rem;
+            font-size: 1.5rem;
+            color: #2e5cb8;
+        }
+        .project p, .project ul {
+            margin: 0.5rem 0;
+            line-height: 1.6;
+        }
+        .project ul {
+            padding-left: 1.5rem;
+        }
+        .certifications, .contact-form {
+            margin: 1rem 0;
+        }
+        .contact-form form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .contact-form label {
+            font-weight: 700;
+            color: #1a3c6e;
+        }
+        .contact-form input, .contact-form textarea {
+            padding: 0.5rem;
+            border: 1px solid #2e5cb8;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        .contact-form textarea {
+            resize: vertical;
+            height: 150px;
+        }
+        .contact-form button {
+            background-color: #2e5cb8;
+            color: white;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+        .contact-form button:hover {
+            background-color: #1a3c6e;
+        }
+        .contact-form p.note {
+            font-size: 0.9rem;
+            color: #555;
+            text-align: center;
+        }
+        footer {
+            background-color: #1a3c6e;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #2e5cb8;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            text-decoration: none;
+            display: none;
+        }
+        .back-to-top:hover {
+            background-color: #1a3c6e;
+        }
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            header p {
+                font-size: 1rem;
+            }
+            nav a {
+                margin: 0 0.5rem;
+                font-size: 0.9rem;
+            }
+            section {
+                padding: 1rem;
+            }
+            .contact-form form {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Sourabh Mishra</h1>
+        <p>Strategic IT Leader | 20+ Yrs Driving Enterprise Digital Transformation to Maximize Business Value, Ensure Strategic Alignment & Achieve Operational Excellence | Cloud, Infra, ITIL | ICP-LPM, PMP, AWS, Azure Certified</p>
+    </header>
+    <nav>
+        <a href="#about">About</a>
+        <a href="#projects">Projects</a>
+        <a href="#certifications">Certifications</a>
+        <a href="#contact">Contact</a>
+    </nav>
+    <section id="about">
+        <h2>About Me</h2>
+        <p>Visionary IT leader with over 20 years of experience delivering transformative technology solutions for Fortune 500 clients in manufacturing, finance, healthcare, and energy sectors. Drove $50M+ in cost savings, 15–40% operational efficiencies, and 99.9% service reliability across NAM, SAM, EMEA, and APAC. Trusted C-suite advisor, aligning IT strategies with enterprise OKRs and KPIs to enhance profitability, agility, and innovation. Expertise in cloud computing, IT infrastructure, and emerging technologies (e.g., AI, IoT, predictive analytics) enables scalable, data-driven solutions. Renowned for optimizing enterprise-wide P&L, securing strategic partnerships, and driving cross-functional collaboration with operations, sales, and finance to achieve organizational excellence.</p>
+    </section>
+    <section id="projects">
+        <h2>Key Programs & Projects</h2>
+        <div class="project">
+            <h3>Global IT Refresh Program</h3>
+            <p><strong>Role:</strong> Program Manager</p>
+            <p><strong>Summary:</strong> Spearheaded a $43M global IT modernization initiative for a leading manufacturer, transforming 35 sites across North America, South America, EMEA, and APAC. Delivered a scalable, secure, and future-ready IT ecosystem by upgrading infrastructure, enhancing cybersecurity, migrating to cloud platforms, modernizing legacy systems, and deploying standardized enterprise applications. Aligned program outcomes with business objectives, driving operational efficiency, stakeholder satisfaction, and global team collaboration.</p>
+            <p><strong>Executive-Level Achievements:</strong></p>
+            <ul>
+                <li><strong>Strategic Technology Leadership:</strong> Executed a $43M program across 35 sites, achieving 92% alignment with global technology strategy. Collaborated with C-suite and regional stakeholders to implement technology roadmaps, boosting satisfaction by 82%. Accelerated cloud and modern technology adoption by 62%. <em>OKRs:</em> 92% strategic alignment (Target: 90%), 82% stakeholder satisfaction (Target: 80%), 62% technology adoption (Target: 60%).</li>
+                <li><strong>Security & Compliance Transformation:</strong> Upgraded network infrastructure and deployed next-generation security solutions, reducing incidents by 42%. Achieved 100% compliance with GDPR, CCPA, and regional regulations. Improved NIST cybersecurity score by 22%. <em>OKRs:</em> Reduced security incidents by 42% (Target: 50%), maintained 100% compliance (Target: 100%), enhanced security score by 22% (Target: 20%).</li>
+                <li><strong>Operational Efficiency & Scalability:</strong> Achieved 22% operational efficiency gains through cloud migration and standardized applications. Migrated 72% of critical workloads to scalable cloud platforms. Increased user satisfaction with enterprise applications by 16%. <em>OKRs:</em> Improved efficiency by 22% (Target: 25%), completed 72% cloud workload migration (Target: 70%), enhanced application satisfaction by 16% (Target: 15%).</li>
+                <li><strong>Program Execution Excellence:</strong> Completed 96% of milestones on or ahead of schedule, with zero critical outages. Orchestrated global vendors and cross-functional teams for seamless execution. Achieved 91% stakeholder satisfaction for program delivery. <em>OKRs:</em> Delivered 96% of projects on time and within budget (Target: 98%), maintained 99.99% system uptime (Target: 99.99%), attained 91% satisfaction score (Target: 90%).</li>
+                <li><strong>Global Team Leadership & Culture:</strong> Led diverse global teams, promoting transparency and a culture of continuous improvement. Implemented talent development programs, improving retention by 12% and skills growth by 22%. Mentored high-potential team members, boosting engagement and performance by 16%. <em>OKRs:</em> Increased engagement score by 16% (Target: 15%), improved retention by 12% (Target: 10%), achieved 22% skills development growth (Target: 20%).</li>
+            </ul>
+        </div>
+        <div class="project">
+            <h3>AS400 Hardware Upgrade for M3 Application</h3>
+            <p><strong>Role:</strong> Program Manager</p>
+            <p><strong>Summary:</strong> Orchestrated a zero-downtime migration of the AS400/M3 system to IBM Power10 for a global manufacturer, ensuring $10M+ daily revenue continuity. Led 20+ cross-functional teams and vendors, modernized legacy infrastructure, boosted performance, and fortified compliance. Delivered a scalable, high-performance IT ecosystem, aligning with business objectives and driving operational efficiency.</p>
+            <ul>
+                <li><strong>Seamless Migration Execution:</strong> Directed zero-downtime AS400/M3 migration to IBM Power10, coordinating 20+ teams (Infor M3, IBM, OpsRamp, SCADA) and resolving 200+ pre-escalation issues, safeguarding $10M+ daily revenue.</li>
+                <li><strong>Performance Optimization:</strong> Improved system performance by 38% through PTF installations, SQL automation, and latency reduction, maintaining 100% data integrity across three servers via MIMIX replication.</li>
+                <li><strong>Risk Mitigation:</strong> Reduced migration risks by 42% with hypercare monitoring, EDI backlog clearance, and proactive contingency plans, averting $1.5M in downtime costs and 20+ high-impact risks (e.g., data corruption, latency).</li>
+                <li><strong>Workflow Automation:</strong> Automated user access management (deactivated 500+ non-essential accounts) and M3 process validation (20+ order-to-cash/procure-to-pay cycles), cutting testing time by 28%.</li>
+                <li><strong>SLA & Technical Precision:</strong> Achieved 100% SLA compliance by executing 20+ technical tasks (Icore shutdown, IP reconfiguration) within a 48-hour window, validated through JDBC tests and OpsRamp integration.</li>
+                <li><strong>SOX Compliance:</strong> Ensured 100% SOX compliance by auditing finance, logistics, and sales interfaces, streamlining audit-ready frameworks and reducing future prep time by 32% for 8+ subsidiaries.</li>
+                <li><strong>Infrastructure Modernization:</strong> Upgraded to scalable AS400 architecture, enabling future ERP integrations and ensuring 99.99% accuracy across 10M+ manufacturing, sales, and logistics records.</li>
+                <li><strong>Stakeholder Alignment:</strong> Enhanced global collaboration with real-time dashboards, Slack/Teams protocols, and RACI matrices, reducing cross-regional delays by 52% and achieving 100% on-time milestone delivery.</li>
+                <li><strong>Transaction Continuity:</strong> Secured $2M/day transaction continuity through rigorous UAT, performance benchmarking, and phased cutovers, earning formal business sign-off post-migration.</li>
+                <li><strong>Real-Time Decision Support:</strong> Developed real-time reporting tools (SQL extracts, M3 Grid health checks) for replication status, enabling swift decision-making during critical 72-hour synchronization cycles.</li>
+            </ul>
+        </div>
+        <div class="project">
+            <h3>Global IT Operations Manual (GITOM) Program</h3>
+            <p><strong>Role:</strong> Program Manager</p>
+            <p><strong>Summary:</strong> Led the development and implementation of the Global IT Operations Manual (GITOM), standardizing 14 ITIL processes across North America, South America, EMEA, and APAC for 1,000+ IT employees. Delivered a unified governance framework, centralized digital repository, and strategic roadmap, driving operational efficiency, compliance, and scalability. Achieved 100% stakeholder satisfaction and positioned ESAB for future IT service management (ITSM) excellence.</p>
+            <ul>
+                <li><strong>Global ITIL Standardization:</strong> Consolidated 14 ITIL processes across four regions, establishing a single governance framework for 1,000+ IT employees, enhancing operational consistency.</li>
+                <li><strong>Digital Transformation:</strong> Launched a centralized GITOM SharePoint repository, boosting documentation accessibility by 42% and enabling seamless adoption through intuitive desktop integration.</li>
+                <li><strong>Stakeholder Engagement:</strong> Conducted 22 workshops for 160+ global stakeholders, ensuring uniform process adoption and aligning with ESAB’s strategic IT goals.</li>
+                <li><strong>Accelerated Delivery:</strong> Executed the program 28% ahead of schedule, meeting 100% of scope and quality benchmarks while maintaining budget discipline.</li>
+                <li><strong>Continuous Improvement:</strong> Deployed KPI dashboards and reporting templates for 14 processes, reducing incident resolution times by 32% and advancing process maturity.</li>
+                <li><strong>Executive Enablement:</strong> Authored a C-suite process playbook, enhancing leadership visibility into IT operations and enabling data-driven decision-making.</li>
+                <li><strong>SOP Unification:</strong> Harmonized 50+ regional SOPs into a global repository, eliminating discrepancies and cutting audit preparation time by 28%.</li>
+                <li><strong>Optimization Roadmap:</strong> Benchmarked process maturity, identifying 15 improvement opportunities and delivering a 3-year roadmap for operational scalability.</li>
+                <li><strong>Cross-Regional Productivity:</strong> Established a standardized IT framework, improving cross-functional productivity by 22% through streamlined workflows and clear role definitions.</li>
+                <li><strong>Strategic Closure:</strong> Concluded the program within budget, achieving 100% stakeholder satisfaction and laying a foundation for scalable ITSM capabilities.</li>
+            </ul>
+        </div>
+        <div class="project">
+            <h3>Datacenter Consolidation Program</h3>
+            <p><strong>Role:</strong> Program Manager</p>
+            <p><strong>Summary:</strong> Spearheaded a transformative datacenter consolidation initiative, reducing 80 disparate locations into resilient primary (Atlanta) and secondary (Melbourne) hubs. Orchestrated all phases—assessment, planning, migration, decommissioning, and optimization—aligning IT infrastructure with business objectives. Delivered substantial cost savings, enhanced operational efficiency, fortified security, and advanced sustainability, achieving 100% stakeholder satisfaction through data-driven execution and robust change management.</p>
+            <p><strong>Key Achievements and Contributions:</strong></p>
+            <ul>
+                <li><strong>Strategic Optimization & Resiliency:</strong> Consolidated infrastructure by 88%, reducing footprint by 62% and cutting application deployment time by 42%. Enhanced resiliency with geographically diverse hubs, achieving 99.99% uptime, 52% RTO reduction, 78% RPO reduction, and zero data loss in disaster recovery tests.</li>
+                <li><strong>Financial & Operational Excellence:</strong> Achieved 32% TCO reduction, 28% lower power consumption, and increased server utilization from 20% to 65%. Modernized infrastructure by virtualizing 82% of servers, standardizing architecture, and reducing hardware vendors by 42%.</li>
+                <li><strong>Program Execution & Risk Management:</strong> Delivered 92% of milestones ahead of schedule, maintained budget within 8% of allocation, and achieved 82% risk mitigation effectiveness. Ensured 92% user satisfaction through comprehensive change management.</li>
+                <li><strong>Data-Driven & Secure Transformation:</strong> Ensured 100% accuracy in inventory and dependency mapping, leveraging analytics to reduce migration time by 18%. Implemented zero-trust architecture, cutting vulnerabilities by 42% and maintaining 100% GDPR and HIPAA compliance.</li>
+                <li><strong>Efficiency & Sustainability:</strong> Reduced MTTR by 32%, automated 72% of routine tasks, and improved SLA delivery by 22%. Advanced sustainability with 28% lower energy use, 18% increased renewable energy adoption, and a PUE rating of 1.4.</li>
+            </ul>
+        </div>
+        <div class="project">
+            <h3>Project Management Framework Implementation</h3>
+            <p><strong>Role:</strong> Program Manager</p>
+            <p><strong>Summary:</strong> Led an 8-month initiative to design and deploy an enterprise-grade project management framework for Europe’s largest aerospace corporation, ensuring alignment with EASA and AS9100 standards. Streamlined €300M+ programs through Agile-Stage-Gate workflows, robust governance, and scalable PMO infrastructure, delivering €1.5M in annual savings, 30% risk reduction, and accelerated time-to-market. Achieved 95% process adoption and laid the foundation for ESG-aligned innovation.</p>
+            <ul>
+                <li><strong>Strategic Framework Deployment:</strong> Designed and implemented a tailored project management framework across 10+ global sites, fully compliant with EASA and AS9100 standards, enhancing program delivery for critical aviation systems.</li>
+                <li><strong>Cross-Functional Collaboration:</strong> Leveraged Agile-Stage-Gate hybrid workflows to reduce project delays by 28% and accelerate time-to-market by 6 months, fostering seamless coordination across global teams.</li>
+                <li><strong>Governance & Risk Mitigation:</strong> Established governance frameworks, risk protocols, and KPIs for €300M+ programs, cutting operational risks by 32% and achieving €1.5M in annual cost savings through optimized processes.</li>
+                <li><strong>Employee Training & Adoption:</strong> Trained 160+ employees on Jira, Confluence, and compliance workflows, achieving 96% adoption of new processes within 5 months, boosting workforce efficiency.</li>
+                <li><strong>Scalable PMO Infrastructure:</strong> Delivered a robust PMO system, improving resource allocation efficiency by 22% and enabling real-time tracking of R&D and manufacturing milestones.</li>
+                <li><strong>Compliance & Sustainability:</strong> Ensured 100% compliance with EU aerospace safety regulations while embedding ESG principles, supporting sustainable aviation roadmaps for long-term innovation.</li>
+            </ul>
+        </div>
+        <div class="project">
+            <h3>AWS Cloud Migration Project</h3>
+            <p><strong>Role:</strong> Program Manager</p>
+            <p><strong>Duration:</strong> Oct 2022 – Aug 2023</p>
+            <p><strong>Summary:</strong> Spearheaded the end-to-end migration of 50+ on-premises systems to AWS, achieving 99.9% uptime and seamless business continuity. Orchestrated a hybrid cloud strategy, modernized legacy applications, and optimized costs, delivering $550K in annual savings. Strengthened security, streamlined operations, and drove stakeholder adoption through robust governance, automation, and training, positioning the organization for scalable cloud success.</p>
+            <ul>
+                <li><strong>Seamless Migration Execution:</strong> Led migration of 50+ on-premises systems to AWS, ensuring 99.9% uptime and zero critical disruptions post-launch.</li>
+                <li><strong>Hybrid Cloud Strategy:</strong> Coordinated IT, security, and business teams to align migration timelines with organizational priorities, enabling a cohesive hybrid cloud environment.</li>
+                <li><strong>Cost Optimization:</strong> Reduced annual infrastructure costs by 38% through resource optimization, AWS Cost Explorer forecasting, and negotiating Reserved Instances.</li>
+                <li><strong>Security & Compliance:</strong> Collaborated with cybersecurity teams to implement AWS Shield, IAM controls, and encryption, achieving 100% GDPR and ISO 27001 compliance.</li>
+                <li><strong>Application Modernization:</strong> Modernized 16 legacy applications with engineering teams, leveraging AWS Lambda and ECS to cut deployment cycles by 42%.</li>
+                <li><strong>Workflow Automation:</strong> Streamlined operations with AWS CloudFormation and CodePipeline, reducing manual errors by 28% and enhancing process efficiency.</li>
+                <li><strong>Data Migration:</strong> Oversaw migration of 22 TB of critical business data to Amazon S3 and RDS, ensuring 100% data integrity and a 20% performance boost.</li>
+                <li><strong>Stakeholder Enablement:</strong> Drove adoption through 10+ training workshops and comprehensive documentation on AWS Cost Explorer and operational tools, achieving 95% user proficiency.</li>
+                <li><strong>Risk Mitigation:</strong> Established governance frameworks, AWS Config compliance checks, and contingency plans, mitigating 90% of potential risks.</li>
+                <li><strong>Financial Impact:</strong> Delivered $550K in annual savings and ROI through optimized cloud operations, minimized downtime, and enhanced scalability.</li>
+            </ul>
+        </div>
+        <div class="project">
+            <h3>AI-Powered Fintech Cloud Native Application Development</h3>
+            <p><strong>Role:</strong> Program Manager</p>
+            <p><strong>Summary:</strong> Led the development of an AI-powered, cloud-native fintech application for a US client, delivering a scalable, secure, and customer-centric platform. Reduced operational costs by 32%, accelerated transaction processing by 42%, and enhanced fraud detection with 95% prediction accuracy. Ensured regulatory compliance, optimized Agile delivery, and drove stakeholder trust, resulting in a 20% engagement scope expansion and high user satisfaction.</p>
+            <ul>
+                <li><strong>Strategic Delivery Leadership:</strong> Orchestrated cross-functional teams to deliver a cloud-native fintech application, cutting operational costs by 32% and boosting transaction processing speed by 42%.</li>
+                <li><strong>AI-Driven Innovation:</strong> Implemented AI for fraud detection and personalized insights, achieving 95% prediction accuracy and reducing fraudulent transactions by 28% post-launch.</li>
+                <li><strong>Scalable Cloud Infrastructure:</strong> Managed end-to-end cloud architecture design, ensuring 99.99% uptime, seamless system integration, and scalability through DevOps collaboration.</li>
+                <li><strong>Automation Excellence:</strong> Championed automation, eliminating 72% of manual processes and enabling real-time decision-making via AI-integrated financial data streams.</li>
+                <li><strong>Regulatory Compliance:</strong> Ensured 100% compliance with SEC and FINRA regulations by implementing audit trails, encryption, and robust access controls in partnership with legal and security teams.</li>
+                <li><strong>Customer-Centric Platform:</strong> Led collaboration with product, UX, and compliance teams to deliver a user-focused platform, increasing end-user satisfaction by 28%.</li>
+                <li><strong>Agile Optimization:</strong> Streamlined Agile workflows and CI/CD pipelines, reducing deployment timelines by 52% and enabling rapid feature releases.</li>
+                <li><strong>Data Strategy Execution:</strong> Oversaw data architecture for 10M+ daily transactions, improving reporting efficiency and cutting analytics turnaround time by 62%.</li>
+                <li><strong>Risk Mitigation:</strong> Prioritized security best practices, achieving zero critical breaches and maintaining stakeholder confidence throughout the project lifecycle.</li>
+                <li><strong>Client Engagement Growth:</strong> Fostered transparent communication and Agile milestone delivery, driving a 20% expansion of project scope and strengthening client trust.</li>
+            </ul>
+        </div>
+    </section>
+    <section id="certifications">
+        <h2>Certifications</h2>
+        <div class="certifications">
+            <ul>
+                <li>ICAgile Certified Professional - Lean Portfolio Management (ICP-LPM)</li>
+                <li>Advanced Digital Transformation Specialization, IIM Ahmedabad</li>
+                <li>Project Management Professional (PMP), Certification No: 1850259</li>
+                <li>AWS Certified Solutions Architect – Professional SAP-C02, Verification ID: EVJ56X7CXFFEQ7WX</li>
+                <li>Microsoft Certified: Azure Solutions Architect Expert AZ-305, Credential ID: 5257D61FEF543200</li>
+                <li>ITIL® Expert Certificate in IT Service Management, Certification No: GR761009996SM</li>
+                <li>Lean Six Sigma Black Belt</li>
+                <li>Certification in Risk Management, New York Institute of Finance</li>
+                <li>Microsoft Program Management</li>
+                <li>IBM IT Scrum Master</li>
+            </ul>
+        </div>
+    </section>
+    <section id="contact">
+        <h2>Contact Me</h2>
+        <div class="contact-form">
+            <form action="https://formspree.io/f/your-form-id" method="POST">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+                <label for="message">Message:</label>
+                <textarea id="message" name="message" required></textarea>
+                <button type="submit">Send Message</button>
+            </form>
+            <p class="note">Note: Form submission requires backend integration (e.g., Formspree, custom server). Replace 'your-form-id' with your Formspree ID or configure a backend.</p>
+        </div>
+    </section>
+    <footer>
+        <p>© 2025 Sourabh Mishra. All rights reserved.</p>
+    </footer>
+    <a href="#" class="back-to-top" id="backToTop">Back to Top</a>
+    <script>
+        window.onscroll = function() {
+            let backToTop = document.getElementById('backToTop');
+            if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+                backToTop.style.display = 'block';
+            } else {
+                backToTop.style.display = 'none';
+            }
+        };
+    </script>
+</body>
+</html>
